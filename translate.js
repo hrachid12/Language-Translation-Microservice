@@ -122,9 +122,18 @@ router.post('/', (req, res) => {
 
         if (valid) {
             post_translation(req.body.text, req.body.source.toLowerCase(), req.body.target.toLowerCase()).then((key) => {
-                res.status(201).send({
-                    "id": key.id, 
-                    "self": req.protocol + '://' + req.get('host') + req.baseUrl + '/' + key.id 
+                get_translation(key.id).then((translation) => {
+                    if (translation) {
+                        translation.self = req.protocol + '://' + req.get('host') + req.baseUrl + '/' + key.id 
+                        res.status(201).send({
+                            "id": translation.id,
+                            "text": translation.text,
+                            "source": translation.source,
+                            "target": translation.target,
+                            "translated": translation.translated,
+                            "self": translation.self
+                        });
+                    }
                 });
             });
         } else {
